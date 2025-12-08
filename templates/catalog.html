@@ -1,0 +1,63 @@
+{% extends "base.html" %} 
+{% block title %}Головна - Світ Кросівок{% endblock %} 
+
+{% block content %}
+
+{% if search_query %}
+    <h1 class="text-3xl font-bold mb-6 text-center">
+        Результати пошуку для: "{{ search_query }}"
+    </h1>
+{% elif category_name %}
+    <h1 class="text-3xl font-bold mb-6 text-center">
+        Категорія: {{ category_name }}
+    </h1>
+{% endif %}
+
+{% if not search_query and not category_name %}
+
+{% endif %}
+<h2 class="text-3xl font-bold mb-6 text-center">
+    {% if search_query or category_name %}
+        Знайдені товари
+    {% else %}
+        Наш Каталог
+    {% endif %}
+</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    
+    {% for sneaker in sneakers %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300">
+        <img src="{{ sneaker['image_url'] }}" alt="{{ sneaker['name'] }}" class="w-full h-48 object-cover">
+        <div class="p-4">
+            <h3 class="font-bold text-xl mb-2">{{ sneaker['name'] }}</h3>
+            
+            {% if sneaker['category_name'] %}
+            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mb-2">
+                {{ sneaker['category_name'] }}
+            </span>
+            {% endif %}
+            
+            <p class="text-gray-600 mb-2">{{ sneaker['description'] }}</p>
+            <p class="text-xl font-bold text-gray-900">{{ sneaker['price'] }} грн</p>
+            
+            <form action="{{ url_for('shop.add_to_cart', sneaker_id=sneaker['id']) }}" method="POST">
+                <button type="submit" class="w-full mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                    Купити
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% if not sneakers %}
+        <p class="text-center text-gray-600 text-lg md:col-span-3">
+            На жаль, товарів не знайдено.
+        </p>
+    {% endif %}
+</div>
+
+{% if not search_query and not category_name %}
+
+{% endif %}
+{% endblock %}
