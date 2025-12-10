@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Каталог - Світ Кросівок{% endblock %}
+
+{% block content %}
+<div class="mb-12">
+    <h1 class="text-4xl font-bold text-center mb-4">
+        {% if search_query %}
+            Результати пошуку: "{{ search_query }}"
+        {% elif category_name %}
+            {{ category_name }}
+        {% else %}
+            Весь Каталог
+        {% endif %}
+    </h1>
+    <p class="text-center text-gray-600">Знайдено {{ sneakers|length }} товарів</p>
+</div>
+
+{% if sneakers %}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        {% for sneaker in sneakers %}
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+            <img src="{{ sneaker.image_url }}" alt="{{ sneaker.name }}" class="w-full h-64 object-cover">
+            <div class="p-4">
+                <h3 class="text-lg font-bold mb-2">{{ sneaker.name }}</h3>
+                {% if sneaker.category_name %}
+                    <p class="text-sm text-gray-500 mb-2">{{ sneaker.category_name }}</p>
+                {% endif %}
+                <p class="text-gray-600 text-sm mb-4">{{ sneaker.description }}</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-xl font-bold text-blue-600">₴{{ sneaker.price }}</span>
+                    <form method="POST" action="{{ url_for('shop.add_to_cart', sneaker_id=sneaker.id) }}">
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                            До Кошика
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-12">
+        <p class="text-gray-600 text-xl mb-6">Товарів не знайдено</p>
+        <a href="{{ url_for('shop.home') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+            На Головну
+        </a>
+    </div>
+{% endif %}
+
+<div class="text-center mb-8">
+    <a href="{{ url_for('shop.home') }}" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition">
+        ← Повернутись
+    </a>
+</div>
+{% endblock %}
