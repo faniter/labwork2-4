@@ -17,14 +17,9 @@ def load_categories():
 
 @shop_bp.route('/')
 def home():
-    conn = get_db_conn()
-    sneakers_rows = conn.execute('''
-        SELECT s.*, c.name as category_name 
-        FROM sneakers s
-        LEFT JOIN categories c ON s.category_id = c.id
-    ''').fetchall()
-    conn.close()
-    return render_template('home.html', sneakers=sneakers_rows)
+    sneakers = get_all_sneakers()[:3]  
+    has_more = len(get_all_sneakers()) > 
+    return render_template('home.html', sneakers=sneakers, has_more=has_more)
 
 @shop_bp.route('/about')
 def about():
