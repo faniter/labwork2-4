@@ -13,12 +13,16 @@ def load_categories():
     g.categories = conn.execute('SELECT * FROM categories ORDER BY name').fetchall()
     conn.close()
 
-
+from flask import (
+    Blueprint, render_template, g, request, 
+    session, redirect, url_for
+)
+from models import get_db_conn, get_all_sneakers
 
 @shop_bp.route('/')
 def home():
     sneakers = get_all_sneakers()[:3]  
-    has_more = len(get_all_sneakers()) > 
+    has_more = len(get_all_sneakers()) > 3
     return render_template('home.html', sneakers=sneakers, has_more=has_more)
 
 @shop_bp.route('/catalog')
