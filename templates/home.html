@@ -71,6 +71,14 @@
     {% endif %}
 </div>
 
+{% if has_more %}
+    <div class="text-center mb-12">
+        <a href="{{ url_for('shop.catalog') }}" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition text-lg font-bold">
+            Всі Товари
+        </a>
+    </div>
+    {% endif %}
+
 {% if not search_query and not category_name %}
 <h2 class="text-3xl font-bold mb-6 text-center">Чому Обирають Нас?</h2>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
