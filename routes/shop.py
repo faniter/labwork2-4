@@ -21,6 +21,16 @@ def home():
     has_more = len(get_all_sneakers()) > 
     return render_template('home.html', sneakers=sneakers, has_more=has_more)
 
+@shop_bp.route('/catalog')
+def catalog():
+    category_id = request.args.get('category_id', type=int)
+    search = request.args.get('search', type=str)
+    sneakers = get_all_sneakers(category_id=category_id, search=search)
+    category_name = None
+    if category_id:
+        category_name = next((c['name'] for c in g.categories if c['id'] == category_id), None)
+    return render_template('catalog_products.html', sneakers=sneakers, category_name=category_name, search_query=search)
+
 @shop_bp.route('/about')
 def about():
     return render_template('about.html')
