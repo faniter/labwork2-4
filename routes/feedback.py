@@ -3,8 +3,12 @@ from models import get_db_conn
 
 feedback_bp = Blueprint('feedback', __name__)
 
-@feedback_bp.route('/feedback', methods=['GET', 'POST'])
+@feedback_bp.route('/feedback', methods=['GET'])
 def handle_feedback():
+    return render_template('feedback.html')
+
+@feedback_bp.route('/api/feedback', methods=['GET', 'POST'])
+def handle_api_feedback():
     
     if request.method == 'POST':
         
@@ -25,5 +29,7 @@ def handle_feedback():
         return redirect(url_for('shop.home'))
 
     
-    
-    return render_template('feedback.html')
+    conn = get_db_conn()
+    feedbacks = conn.execute('SELECT * FROM feedback ORDER BY created_at DESC').fetchall()
+    conn.close()
+    return jsonify(feedbacks)

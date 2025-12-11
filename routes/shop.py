@@ -25,7 +25,7 @@ def home():
     has_more = len(get_all_sneakers()) > 3
     return render_template('home.html', sneakers=sneakers, has_more=has_more)
 
-@shop_bp.route('/catalog')
+@shop_bp.route('/api/catalog')
 def catalog():
     category_id = request.args.get('category_id', type=int)
     search = request.args.get('search', type=str)
@@ -39,7 +39,7 @@ def catalog():
 def about():
     return render_template('about.html')
 
-@shop_bp.route('/category/<int:category_id>')
+@shop_bp.route('/api/category/<int:category_id>')
 def category_view(category_id):
     conn = get_db_conn()
     sneakers_rows = conn.execute('''
@@ -56,7 +56,7 @@ def category_view(category_id):
 
 
 
-@shop_bp.route('/search')
+@shop_bp.route('/api/search')
 def search():
     query = request.args.get('q', '') 
     
@@ -73,7 +73,7 @@ def search():
 
 
 
-@shop_bp.route('/cart/add/<int:sneaker_id>', methods=['POST'])
+@shop_bp.route('/api/cart/add/<int:sneaker_id>', methods=['POST'])
 def add_to_cart(sneaker_id):
     cart = session.get('cart', {})
     
@@ -85,7 +85,7 @@ def add_to_cart(sneaker_id):
     
     return redirect(request.referrer or url_for('shop.home'))
 
-@shop_bp.route('/cart')
+@shop_bp.route('/api/cart')
 def view_cart():
     cart = session.get('cart', {})
     if not cart:
@@ -121,7 +121,7 @@ def view_cart():
     
     return render_template('cart.html', items=items_in_cart, total_price=total_price)
 
-@shop_bp.route('/cart/clear')
+@shop_bp.route('/api/cart/clear')
 def clear_cart():
     session['cart'] = {}
     return redirect(url_for('shop.view_cart'))
