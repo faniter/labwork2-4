@@ -6,7 +6,6 @@
     <title>{% block title %}Світ Кросівок{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        
         @keyframes slideDown {
             0% { max-height: 0; opacity: 0; }
             100% { max-height: 300px; opacity: 1; }
@@ -56,7 +55,7 @@
                 </div>
                 <a href="/catalog" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110">Каталог</a>
                 <a href="/about" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110">Про нас</a>
-                <a href="/feedback" class="text-gray-700RpDeveloper" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110">Зворотний зв'язок</a>
+                <a href="/feedback" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110">Зворотний зв'язок</a>
 
                 <a href="{{ url_for('shop.view_cart') }}" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110">
                     Кошик 🛒
@@ -67,8 +66,17 @@
                     {% endif %}
                 </a>
                 
-                <form action="{{ url_for('shop.search') }}" method="GET" class="flex ml-4 transition duration-500 ease-in-out hover:scale-105 " >
-                    <input type="text" name="q" placeholder="Пошук..." class="px-3 py-1 border rounded-l-md text-sm hover:bg-gray-100 transition duration-500 " value="{{ search_query or '' }}">
+                <!-- Блок авторизации -->
+                {% if not session.get('user_id') %}
+                    <a href="/login" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110">Вхід</a>
+                    <a href="/register" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110">Реєстрація</a>
+                {% else %}
+                    <span class="text-gray-700">Вітаємо!</span>
+                    <a href="/logout" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110">Вийти</a>
+                {% endif %}
+                
+                <form action="{{ url_for('shop.search') }}" method="GET" class="flex ml-4 transition duration-500 ease-in-out hover:scale-105">
+                    <input type="text" name="q" placeholder="Пошук..." class="px-3 py-1 border rounded-l-md text-sm hover:bg-gray-100 transition duration-500" value="{{ search_query or '' }}">
                     <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded-r-md text-sm hover:bg-blue-600">
                         Знайти
                     </button>
@@ -85,9 +93,8 @@
         <div id="mobile-menu" class="hidden md:hidden overflow-hidden">
             <a href="/" class="block text-gray-700 hover:text-black py-2 transform transition duration-500 hover:translate-x-2">Головна</a>
             <a href="/about" class="block text-gray-700 hover:text-black py-2 transform transition duration-500 hover:translate-x-2">Про нас</a>
-            <a href="/feedback" class="block text-gray-700 hover:text-black py-2 transform transition duration-500 hover:translate-x-2">Зворотний зв'язок </a>
+            <a href="/feedback" class="block text-gray-700 hover:text-black py-2 transform transition duration-500 hover:translate-x-2">Зворотний зв'язок</a>
             <a href="{{ url_for('shop.view_cart') }}" class="block text-gray-700 hover:text-black py-2 transform transition duration-500 hover:translate-x-2">
-            
                 Кошик {% if session.cart %}({{ session.cart.values() | sum }}){% endif %}
             </a>
             <form action="{{ url_for('shop.search') }}" method="GET" class="flex mt-2 mb-2">
@@ -96,10 +103,15 @@
                     Знайти
                 </button>
             </form>
-            <a href="/reg" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110">Реєстрація</a> / 
-            <a href="/reg" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110">Вхід</a>
+            
+            <!-- Блок авторизации для мобильной версии -->
+            {% if not session.get('user_id') %}
+                <a href="/login" class="block text-gray-700 hover:text-black py-2 transform transition duration-500 hover:translate-x-2">Вхід</a>
+                <a href="/register" class="block text-gray-700 hover:text-black py-2 transform transition duration-500 hover:translate-x-2">Реєстрація</a>
+            {% else %}
+                <a href="/logout" class="block text-gray-700 hover:text-black py-2 transform transition duration-500 hover:translate-x-2">Вийти</a>
+            {% endif %}
         </div>
-        
     </nav>
 
     <div class="container mx-auto mt-8 p-4">
