@@ -44,6 +44,16 @@ def init_db():
     )
     ''')
 
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        email TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL,
+        is_admin INTEGER DEFAULT 0
+    )
+    ''')
+
     conn.commit()
     conn.close()
 
@@ -92,4 +102,45 @@ def get_categories() -> List[Dict[str, Any]]:
     rows = cursor.execute("SELECT * FROM categories ORDER BY name").fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+def create_user(username: str, email: str, password: str) -> Optional[int]:
+    conn = get_db_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute('''
+            INSERT INTO users (username, email, password)
+            VALUES (?, ?, ?)
+        ''', (username, email, password))
+        conn.commit()
+        user_id = cur.lastrowid
+        return user_id
+    except Exception:
+        return None
+    finally:
+        conn.close()
+
+def get_user_by_username(username: str) -> Optional[Dict[str, Any]]:
+    conn = get_db_conn()
+    row = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
+    conn = get_db_conn()
+    row = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def verify_user(username: str, password: str) -> Optional[Dict[str, Any]]:
+    conn = get_db_conn()
+    row = conn.execute('SELECT * FROM users WHERE username = ? AND password = ?', (username, password)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def verify_user_login(login: str, password: str) -> Optional[Dict[str, Any]]:
+    """Перевірка користувача за username + пароль"""
+    conn = get_db_conn()
+    row = conn.execute('SELECT * FROM users WHERE username = ? AND password = ?', (login, password)).fetchone()
+    conn.close()
+    return dict(row) if row else None
 # ...existing code...
