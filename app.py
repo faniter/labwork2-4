@@ -7,6 +7,9 @@ from models import init_db, get_db_conn
 from routes.shop import shop_bp
 from routes.admin import admin_bp
 from routes.feedback import feedback_bp
+from routes.auth import auth_bp
+
+
 
 from flask_jwt_extended import create_access_token, jwt_required, JWTManager, get_jwt_identity
 
@@ -18,8 +21,10 @@ app.config['SECRET_KEY']     = '23ae9366-f681-4ac9-a55f-0fb8b0029b4e'
 app.config['JWT_SECRET_KEY'] = '8874d6c6-8c0b-43d1-a066-0d674d80d3c1'
 
 app.register_blueprint(shop_bp)
+
 app.register_blueprint(admin_bp, url_prefix='/api/admin')
 app.register_blueprint(feedback_bp, url_prefix='/api')
+app.register_blueprint(auth_bp)
 
 
 def ensure_seeded():
