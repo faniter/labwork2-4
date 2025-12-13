@@ -66,23 +66,21 @@
                     {% endif %}
                 </a>
                 
-      
+                <!-- Блок авторизации -->
+                {% if not session.get('user_id') %}
+                    <a href="/login" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110">Вхід</a>
+                    <a href="/register" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110">Реєстрація</a>
+                {% else %}
+                    <span class="text-gray-700">Вітаємо!</span>
+                    <a href="/logout" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110">Вийти</a>
+                {% endif %}
+                
                 <form action="{{ url_for('shop.search') }}" method="GET" class="flex ml-4 transition duration-500 ease-in-out hover:scale-105">
                     <input type="text" name="q" placeholder="Пошук..." class="px-3 py-1 border rounded-l-md text-sm hover:bg-gray-100 transition duration-500" value="{{ search_query or '' }}">
                     <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded-r-md text-sm hover:bg-blue-600">
                         Знайти
                     </button>
                 </form>
-                
-                <!-- В десктопном меню (строка 56-64) замените на: -->
-{% if not session.get('user_id') %}
-    <a href="/login" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110 float-left">Вхід</a>   /
-    <a href="/register" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110 float-left">Реєстрація</a>
-{% else %}
-    <span class="text-gray-700">Привіт, {{ session.get('username', 'Користувач') }}!</span>
-    <a href="/logout" class="text-gray-700 hover:text-black transition duration-500 hover:underline hover:scale-110">Вийти</a>
-{% endif %}
-          
             </div>
             
             <button id="mobile-menu-button" class="md:hidden text-gray-900 w-6 h-6 relative focus:outline-none">
@@ -105,14 +103,14 @@
                     Знайти
                 </button>
             </form>
-            <!-- В мобильном меню (строка 99-105) замените на: -->
-{% if not session.get('user_id') %}
-    <a href="/login" class="block text-gray-700 hover:text-black py-2 transform transition duration-500 hover:translate-x-2">Вхід</a>
-    <a href="/register" class="block text-gray-700 hover:text-black py-2 transform transition duration-500 hover:translate-x-2">Реєстрація</a>
-{% else %}
-    <span class="block text-gray-700 py-2">Привіт, {{ session.get('username', 'Користувач') }}!</span>
-    <a href="/logout" class="block text-gray-700 hover:text-black py-2 transform transition duration-500 hover:translate-x-2">Вийти</a>
-{% endif %}
+            
+            <!-- Блок авторизации для мобильной версии -->
+            {% if not session.get('user_id') %}
+                <a href="/login" class="block text-gray-700 hover:text-black py-2 transform transition duration-500 hover:translate-x-2">Вхід</a>
+                <a href="/register" class="block text-gray-700 hover:text-black py-2 transform transition duration-500 hover:translate-x-2">Реєстрація</a>
+            {% else %}
+                <a href="/logout" class="block text-gray-700 hover:text-black py-2 transform transition duration-500 hover:translate-x-2">Вийти</a>
+            {% endif %}
         </div>
     </nav>
 

@@ -8,6 +8,8 @@ from models import init_db, get_db_conn
 from routes.shop import shop_bp
 from routes.admin import admin_bp
 from routes.feedback import feedback_bp
+from routes.auth import auth_bp
+
 
 
 # Ініціалізація структури БД (створює файл db.sqlite якщо ще нема)
@@ -19,7 +21,7 @@ app.config['SECRET_KEY'] = 'your-very-secret-random-key-12345'
 app.register_blueprint(shop_bp)
 app.register_blueprint(admin_bp, url_prefix='/admin')
 app.register_blueprint(feedback_bp)
-
+app.register_blueprint(auth_bp)
 
 
 def ensure_seeded():
