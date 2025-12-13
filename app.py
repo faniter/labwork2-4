@@ -7,8 +7,6 @@ from models import init_db, get_db_conn
 from routes.shop import shop_bp
 from routes.admin import admin_bp
 from routes.feedback import feedback_bp
-from routes.auth import auth_bp
-
 
 
 from flask_jwt_extended import create_access_token, jwt_required, JWTManager, get_jwt_identity
