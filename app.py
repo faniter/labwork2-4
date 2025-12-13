@@ -10,8 +10,6 @@ from routes.admin import admin_bp
 from routes.feedback import feedback_bp
 
 
-
-
 # Ініціалізація структури БД (створює файл db.sqlite якщо ще нема)
 init_db()
 
