@@ -28,12 +28,15 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(api_bp, url_prefix='/api')
 
 
+
 # Swagger (API documentation)
 app.config['SWAGGER'] = {
     'title': 'Labwork API',
     'uiversion': 3
 }
 Swagger(app)
+
+
 
 
 def ensure_seeded():
