@@ -1,0 +1,204 @@
+{
+	"info": {
+		"_postman_id": "labwork-api-collection",
+		"name": "Labwork API",
+		"description": "REST API для інтернет-магазину кросівок (labwork2-4)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "v1 - Products",
+			"item": [
+				{
+					"name": "GET All Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/v1/products",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "v1", "products"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Products by Category",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/v1/products?category_id=1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "v1", "products"],
+							"query": [
+								{
+									"key": "category_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Products by Search",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/v1/products?search=nike",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "v1", "products"],
+							"query": [
+								{
+									"key": "search",
+									"value": "nike"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Product by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/v1/products/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "v1", "products", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Create Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test Sneakers\",\n  \"description\": \"Test product for API\",\n  \"price\": 99.99,\n  \"image_url\": \"/static/uploads/test.jpg\",\n  \"category_id\": 1\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/v1/products",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "v1", "products"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Product",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/v1/products/10",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "v1", "products", "10"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "v1 - Categories",
+			"item": [
+				{
+					"name": "GET All Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/v1/categories",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "v1", "categories"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "v1 - Feedback",
+			"item": [
+				{
+					"name": "POST Send Feedback",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_name\": \"Тестовий користувач\",\n  \"email\": \"test@example.com\",\n  \"message\": \"Чудовий магазин, дякую!\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/v1/feedback",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "v1", "feedback"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "v2 - Products (Stricter Validation)",
+			"item": [
+				{
+					"name": "POST Create Product v2",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Puma RS-X v2\",\n  \"description\": \"Created via API v2\",\n  \"price\": 125.50,\n  \"image_url\": \"/static/uploads/puma-v2.jpg\",\n  \"category_id\": 2\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/v2/products",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5000",
+							"path": ["api", "v2", "products"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
