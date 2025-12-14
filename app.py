@@ -9,6 +9,7 @@ from routes.admin import admin_bp
 from routes.feedback import feedback_bp
 from routes.auth import auth_bp
 from routes.api import api_bp
+from routes.api_demo import api_demo_bp
 
 from flask_jwt_extended import create_access_token, jwt_required, JWTManager, get_jwt_identity
 from flasgger import Swagger
@@ -26,6 +27,7 @@ app.register_blueprint(admin_bp, url_prefix='/admin')
 app.register_blueprint(feedback_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(api_bp, url_prefix='/api')
+app.register_blueprint(api_demo_bp)
 
 
 
