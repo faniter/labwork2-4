@@ -2,6 +2,7 @@
 import sqlite3
 import os
 from typing import List, Optional, Dict, Any
+from werkzeug.security import generate_password_hash, check_password_hash
 
 DB_NAME = 'db.sqlite'
 
@@ -118,10 +119,11 @@ def create_user(username: str, email: str, password: str) -> Optional[int]:
     conn = get_db_conn()
     try:
         cur = conn.cursor()
+        password_hash = generate_password_hash(password)
         cur.execute('''
             INSERT INTO users (username, email, password)
             VALUES (?, ?, ?)
-        ''', (username, email, password))
+        ''', (username, email, password_hash))
         conn.commit()
         user_id = cur.lastrowid
         return user_id
@@ -144,14 +146,18 @@ def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
 
 def verify_user(username: str, password: str) -> Optional[Dict[str, Any]]:
     conn = get_db_conn()
-    row = conn.execute('SELECT * FROM users WHERE username = ? AND password = ?', (username, password)).fetchone()
+    row = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
     conn.close()
-    return dict(row) if row else None
+    if row and check_password_hash(row['password'], password):
+        return dict(row)
+    return None
 
 def verify_user_login(login: str, password: str) -> Optional[Dict[str, Any]]:
     """Перевірка користувача за username + пароль"""
     conn = get_db_conn()
-    row = conn.execute('SELECT * FROM users WHERE username = ? AND password = ?', (login, password)).fetchone()
+    row = conn.execute('SELECT * FROM users WHERE username = ?', (login,)).fetchone()
     conn.close()
-    return dict(row) if row else None
+    if row and check_password_hash(row['password'], password):
+        return dict(row)
+    return None
 # ...existing code...
