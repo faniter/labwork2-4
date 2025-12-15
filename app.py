@@ -27,8 +27,8 @@ if db_dir and not os.path.exists(db_dir):
 init_db()
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
-app.config['SECRET_KEY']     = '23ae9366-f681-4ac9-a55f-0fb8b0029b4e'
-app.config['JWT_SECRET_KEY'] = '8874d6c6-8c0b-43d1-a066-0d674d80d3c1'
+app.config['SECRET_KEY']     = os.environ.get('SECRET_KEY', '23ae9366-f681-4ac9-a55f-0fb8b0029b4e')
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', '8874d6c6-8c0b-43d1-a066-0d674d80d3c1')
 
 # Зареєстровані маршрути
 app.register_blueprint(shop_bp)
