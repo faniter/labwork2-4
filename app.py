@@ -13,6 +13,15 @@ from routes.api import api_bp
 from flask_jwt_extended import create_access_token, jwt_required, JWTManager, get_jwt_identity
 from flasgger import Swagger
 
+# Налаштування шляху до БД зі змінної середовища та ініціалізація
+# Дефолт: db.sqlite поруч з модулем
+DATABASE_PATH = os.environ.get('DATABASE_PATH', os.path.join(os.path.dirname(__file__), 'db.sqlite'))
+os.environ['DATABASE_PATH'] = DATABASE_PATH
+# Створюємо директорію для файлу бази, якщо потрібно
+db_dir = os.path.dirname(DATABASE_PATH)
+if db_dir and not os.path.exists(db_dir):
+    os.makedirs(db_dir, exist_ok=True)
+
 # Ініціалізація структури БД (створює файл db.sqlite якщо ще нема)
 init_db()
 
@@ -35,6 +44,19 @@ app.config['SWAGGER'] = {
     'uiversion': 3
 }
 Swagger(app)
+
+
+# Health endpoint для перевірки доступності БД
+@app.route('/health')
+def health():
+    try:
+        conn = get_db_conn()
+        cur = conn.cursor()
+        cur.execute('SELECT 1')
+        conn.close()
+        return {'status': 'healthy', 'database': 'connected'}, 200
+    except Exception as e:
+        return {'status': 'unhealthy', 'error': str(e)}, 500
 
 
 
