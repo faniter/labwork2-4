@@ -5,8 +5,19 @@ from typing import List, Optional, Dict, Any
 
 DB_NAME = 'db.sqlite'
 
+def get_db_path() -> str:
+    """Повертає шлях до файлу БД: спочатку читає ENV `DATABASE_PATH`, інакше повертає дефолтний шлях поруч з модулем."""
+    env_path = os.environ.get('DATABASE_PATH')
+    if env_path:
+        return env_path
+    return os.path.join(os.path.dirname(__file__), DB_NAME)
+
+
 def get_db_conn():
-    db_path = os.path.join(os.path.dirname(__file__), DB_NAME)
+    db_path = get_db_path()
+    db_dir = os.path.dirname(db_path)
+    if db_dir and not os.path.exists(db_dir):
+        os.makedirs(db_dir, exist_ok=True)
     conn = sqlite3.connect(db_path, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     return conn
