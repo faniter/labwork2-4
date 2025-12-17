@@ -145,7 +145,6 @@ def allowed_file(filename):
 
 @admin_bp.route('/upload_image', methods=['POST'])
 def upload_image():
-    # Accepts a file from form field 'file' and stores it under static/uploads
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
     file = request.files['file']
@@ -154,7 +153,6 @@ def upload_image():
     if not allowed_file(file.filename):
         return jsonify({'error': 'Invalid file type'}), 400
 
-    # Compute uploads directory relative to project root
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     uploads_dir = os.path.join(project_root, 'static', 'uploads')
     os.makedirs(uploads_dir, exist_ok=True)

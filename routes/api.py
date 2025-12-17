@@ -3,7 +3,6 @@ from models import get_all_sneakers, add_sneaker, delete_sneaker, get_db_conn, g
 try:
     from flasgger import swag_from
 except Exception:
-    # If flasgger is not installed, provide a no-op decorator so the app still runs.
     def swag_from(_=None):
         def decorator(f):
             return f
@@ -12,7 +11,6 @@ except Exception:
 api_bp = Blueprint('api', __name__)
 
 
-# === v1 endpoints (more permissive) ===
 
 @api_bp.route('/v1/products', methods=['GET'])
 @swag_from({
@@ -179,7 +177,6 @@ def v1_create_product():
 })
 def v1_delete_product(product_id):
     """Видалити товар за ID"""
-    # check exists
     conn = get_db_conn()
     exists = conn.execute('SELECT 1 FROM sneakers WHERE id = ?', (product_id,)).fetchone()
     conn.close()
@@ -255,7 +252,6 @@ def v1_feedback():
     return jsonify({'status': 'ok'}), 201
 
 
-# === v2 endpoints (stricter validation, example of versioning) ===
 
 @api_bp.route('/v2/products', methods=['POST'])
 @swag_from({
@@ -303,7 +299,6 @@ def v1_feedback():
 def v2_create_product():
     """Створити товар з строгою валідацією (API v2)"""
     data = request.get_json() or {}
-    # stricter validation
     if not isinstance(data.get('name'), str) or not data.get('name'):
         return jsonify({'error': 'Field "name" must be a non-empty string'}), 400
     try:
@@ -314,7 +309,6 @@ def v2_create_product():
     image_url = data.get('image_url', '')
     category_id = data.get('category_id')
     sneaker_id = add_sneaker(data['name'], description, price, image_url, category_id)
-    # return created resource
     conn = get_db_conn()
     row = conn.execute('SELECT s.*, c.name as category_name FROM sneakers s LEFT JOIN categories c ON s.category_id = c.id WHERE s.id = ?', (sneaker_id,)).fetchone()
     conn.close()

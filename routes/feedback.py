@@ -57,6 +57,5 @@ def handle_api_feedback():
     feedbacks = conn.execute('SELECT * FROM feedback ORDER BY created_at DESC').fetchall()
     conn.close()
     
-    # Перетворюємо Row об'єкти у словники для JSON серіалізації
     feedbacks_list = [dict(row) for row in feedbacks]
     return jsonify(feedbacks_list)
