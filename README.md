@@ -265,6 +265,9 @@ Swagger UI надає інтерактивний інтерфейс для те�
 
 ---
 
+
+
+
 # Лабораторна робота 6
 
 **Студент:** Бугайчук Д.П. Гринишин М.С. Гапяк М.В. Сюйва Д.Р.
@@ -490,3 +493,284 @@ docker-compose up --build
 ## ✅ Висновки
 
 В ході виконання лабораторної роботи №6 було успішно реалізовано інтерактивну веб-сторінку для роботи з REST API. Я навчився створювати асинхронні AJAX запити за допомогою Fetch API, обробляти відповіді від сервера у форматі JSON, динамічно оновлювати DOM без перезавантаження сторінки, та відображати інформативні повідомлення користувачу. Також було покращено навігацію адміністративної панелі, додавши кнопку API Demo до всіх розділів. Робота з FormData та обробка помилок HTTP запитів поглибила розуміння взаємодії frontend та backend частин веб-застосунку.
+
+
+
+
+
+
+# Лабораторна робота №5
+
+# Звіт з контейнеризації проєкту (Docker)
+
+## Огляд проєкту
+
+Flask застосунок "Світ Кросівок" (KickZone) - це повнофункціональний інтернет-магазин взуття з REST API, адміністративною панеллю, системою аутентифікації, кошиком покупок та відгуками користувачів. Застосунок використовує SQLite для збереження даних, Swagger для документації API, JWT для авторизації та Tailwind CSS для frontend.
+
+## Архітектура контейнерного рішення
+
+### Docker образ
+
+- **Базовий образ:** `python:3.11-slim`
+- **Розмір фінального образу:** ~200-250 MB
+- **Використання багатоетапної збірки:** Ні (для спрощення, але можливо додати)
+- **Оптимізації:**
+  - Використання `.dockerignore` для виключення непотрібних файлів
+  - `--no-cache-dir` при встановленні pip пакетів
+  - Змінні середовища `PYTHONDONTWRITEBYTECODE=1` та `PYTHONUNBUFFERED=1`
+  - Окремий шар для requirements.txt для кешування залежностей
+
+### Docker Compose
+
+- **Кількість сервісів:** 2
+  1. **web** - Flask застосунок на Python
+  2. **nginx** - Reverse proxy для production
+  
+- **Використовувані volumes:**
+  - `sqlite_data:/app/data` - постійне збереження бази даних SQLite
+  - `static_files:/app/static` - статичні файли (CSS, JS, зображення)
+  - `./nginx.conf:/etc/nginx/conf.d/default.conf` - конфігурація Nginx
+
+- **Мережа:** Автоматично створена default bridge network
+- **Ports:**
+  - Nginx: `80:80` (зовнішній доступ)
+  - Flask: `5000` (внутрішній, через expose)
+
+### Структура Dockerfile
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+COPY . /app
+
+ENV FLASK_APP=app.py
+ENV FLASK_ENV=production
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DATABASE_PATH=/app/data/database.db
+
+EXPOSE 5000
+
+CMD ["python", "app.py"]
+```
+
+### Health Check
+
+Додано перевірку здоров'я контейнера:
+```yaml
+healthcheck:
+  test: ["CMD-SHELL", "python -c \"import urllib.request,sys; r=urllib.request.urlopen('http://127.0.0.1:5000/health'); sys.exit(0 if r.getcode()==200 else 1)\""]
+  interval: 30s
+  timeout: 3s
+  retries: 3
+  start_period: 10s
+```
+
+## Прийняті рішення та обґрунтування
+
+### Вибір базового образу
+
+**Обрано:** `python:3.11-slim`
+
+**Обґрунтування:**
+- **Актуальна версія Python** - 3.11 має покращену продуктивність порівняно з 3.10
+- **Slim варіант** - менший розмір (~150 MB проти ~900 MB для повного образу)
+- **Безпека** - офіційний образ з регулярними оновленнями
+- **Баланс** - містить необхідні системні бібліотеки без зайвого
+
+**Альтернативи:**
+- `python:3.11-alpine` - ще менший, але може бути проблеми з деякими пакетами
+- `python:3.11` - повний образ, надто великий для продакшену
+
+### Організація збереження даних
+
+**Рішення:** Named volumes для SQLite бази
+
+**Реалізація:**
+```yaml
+volumes:
+  - sqlite_data:/app/data
+```
+
+**Переваги:**
+- ✅ Дані зберігаються між перезапусками контейнера
+- ✅ Docker автоматично керує розташуванням на хості
+- ✅ Легке резервне копіювання (`docker volume backup`)
+- ✅ Портативність між середовищами
+
+**Альтернативи (не обрано):**
+- Bind mount (`./data:/app/data`) - менш портативний, проблеми з правами доступу
+- Внутрішнє збереження - втрата даних при видаленні контейнера
+
+### Оптимізації
+
+1. **Багатошарове кешування**
+   - Requirements копіюються окремо від коду
+   - При зміні коду залежності не перевстановлюються
+
+2. **Зменшення розміру образу**
+   - Використання slim базового образу
+   - `.dockerignore` для виключення __pycache__, .git, тестів
+   - `--no-cache-dir` для pip
+
+3. **Production готовність**
+   - Nginx як reverse proxy для кращої продуктивності
+   - Health checks для моніторингу
+   - `restart: unless-stopped` для автоматичного відновлення
+
+4. **Безпека**
+   - Змінні середовища для секретів (SECRET_KEY)
+   - Flask не експонується напряму (через Nginx)
+   - Non-root user (можна додати)
+
+### Nginx як Reverse Proxy
+
+**Переваги:**
+- Обробка статичних файлів ефективніше за Flask
+- SSL/TLS термінація (можна додати)
+- Load balancing (при масштабуванні)
+- Кешування
+- Compression (gzip)
+
+## Інструкції з розгортання
+
+### Локальний запуск (Development)
+
+**1. Клонування репозиторію:**
+```bash
+git clone https://github.com/faniter/labwork2-4.git
+cd labwork2-4
+```
+
+**2. Створення .env файлу (опціонально):**
+```bash
+cp .env.example .env
+
+```
+
+**3. Збірка та запуск:**
+```bash
+docker-compose up --build
+```
+
+**4. Доступ до застосунку:**
+- Веб-сайт: http://localhost
+- API: http://localhost/api/v1/products
+- Swagger: http://localhost/apidocs
+
+**5. Зупинка:**
+```bash
+docker-compose down
+```
+
+### Production розгортання
+
+**1. Використання production compose файлу:**
+```bash
+docker-compose -f docker-compose.yml up -d
+```
+
+**2. Перегляд логів:**
+```bash
+docker-compose logs -f
+```
+
+**3. Резервне копіювання бази даних:**
+```bash
+docker run --rm -v labwork2-4_sqlite_data:/data -v $(pwd):/backup alpine tar czf /backup/db-backup.tar.gz -C /data .
+```
+
+**4. Відновлення бази даних:**
+```bash
+docker run --rm -v labwork2-4_sqlite_data:/data -v $(pwd):/backup alpine sh -c "cd /data && tar xzf /backup/db-backup.tar.gz"
+```
+
+**5. Оновлення застосунку:**
+```bash
+git pull
+docker-compose down
+docker-compose build
+docker-compose up -d
+```
+
+### Корисні команди
+
+```bash
+docker-compose ps
+
+docker-compose exec web python seed.py
+
+docker stats
+
+docker-compose down -v
+
+docker volume ls
+```
+
+## Можливі покращення
+
+### 1. Багатоетапна збірка (Multi-stage build)
+```dockerfile
+FROM python:3.11-slim as builder
+
+FROM python:3.11-slim
+
+```
+**Переваги:** Менший фінальний образ
+
+### 2. Використання PostgreSQL замість SQLite
+**Переваги:** Краща продуктивність, concurrency, scalability
+
+### 3. Redis для кешування
+**Переваги:** Прискорення API відповідей, сесії
+
+### 4. Додавання SSL/TLS
+```yaml
+nginx:
+  ports:
+    - "443:443"
+  volumes:
+    - ./ssl:/etc/nginx/ssl
+```
+
+### 5. CI/CD Pipeline
+- Автоматична збірка образів
+- Тестування перед deploy
+- Автоматичне розгортання
+
+### 6. Kubernetes orchestration
+**Для масштабування:**
+- Horizontal Pod Autoscaler
+- LoadBalancer service
+- Persistent Volume Claims
+
+### 7. Моніторинг та логування
+- Prometheus + Grafana
+- ELK Stack (Elasticsearch, Logstash, Kibana)
+- Sentry для error tracking
+
+### 8. Non-root user в Dockerfile
+```dockerfile
+RUN useradd -m -u 1000 appuser
+USER appuser
+```
+**Переваги:** Підвищена безпека
+
+## Висновки
+
+В процесі контейнеризації Flask застосунку було успішно реалізовано production-ready рішення з використанням Docker та Docker Compose. Архітектура з двома сервісами (Flask + Nginx) забезпечує оптимальну продуктивність та безпеку. Використання named volumes гарантує збереження даних між перезапусками, а health checks забезпечують моніторинг стану застосунку.
+
+Основні досягнення:
+- ✅ Повна контейнеризація застосунку
+- ✅ Оптимізований Docker образ (~200 MB)
+- ✅ Організація збереження даних через volumes
+- ✅ Production-ready конфігурація з Nginx
+- ✅ Health checks та автоматичний restart
+- ✅ Документовані інструкції з розгортання
+
+Контейнеризація значно спростила процес розгортання та забезпечила портативність застосунку між різними середовищами (development, staging, production). Docker Compose дозволяє легко керувати multi-container архітектурою одною командою, що особливо важливо при розробці в команді.

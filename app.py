@@ -14,23 +14,18 @@ from routes.api_demo import api_demo_bp
 from flask_jwt_extended import create_access_token, jwt_required, JWTManager, get_jwt_identity
 from flasgger import Swagger
 
-# Налаштування шляху до БД зі змінної середовища та ініціалізація
-# Дефолт: db.sqlite поруч з модулем
 DATABASE_PATH = os.environ.get('DATABASE_PATH', os.path.join(os.path.dirname(__file__), 'db.sqlite'))
 os.environ['DATABASE_PATH'] = DATABASE_PATH
-# Створюємо директорію для файлу бази, якщо потрібно
 db_dir = os.path.dirname(DATABASE_PATH)
 if db_dir and not os.path.exists(db_dir):
     os.makedirs(db_dir, exist_ok=True)
 
-# Ініціалізація структури БД (створює файл db.sqlite якщо ще нема)
 init_db()
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.config['SECRET_KEY']     = os.environ.get('SECRET_KEY', '23ae9366-f681-4ac9-a55f-0fb8b0029b4e')
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', '8874d6c6-8c0b-43d1-a066-0d674d80d3c1')
 
-# Зареєстровані маршрути
 app.register_blueprint(shop_bp)
 app.register_blueprint(admin_bp, url_prefix='/admin')
 app.register_blueprint(feedback_bp)
@@ -40,7 +35,6 @@ app.register_blueprint(api_demo_bp)
 
 
 
-# Swagger (API documentation)
 app.config['SWAGGER'] = {
     'title': 'Labwork API',
     'uiversion': 3
@@ -48,7 +42,6 @@ app.config['SWAGGER'] = {
 Swagger(app)
 
 
-# Health endpoint для перевірки доступності БД
 @app.route('/health')
 def health():
     try:
@@ -70,7 +63,6 @@ def ensure_seeded():
         cur = conn.cursor()
         cur.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='sneakers'")
         if cur.fetchone()[0] == 0:
-            # таблиці не існують — init_db вже викликаний, але надійність
             init_db()
         cur.execute("SELECT COUNT(*) FROM sneakers")
         count = cur.fetchone()[0]
@@ -81,11 +73,11 @@ def ensure_seeded():
     if count == 0:
         seed_path = os.path.join(os.path.dirname(__file__), 'seed.py')
         if os.path.exists(seed_path):
-            # Виконуємо seed.py (виконає додавання категорій/товарів)
+
             runpy.run_path(seed_path, run_name="__main__")
 
 
-# JSON error handlers
+
 @app.errorhandler(400)
 def bad_request(e):
     return {'error': 'Bad Request'}, 400
@@ -103,5 +95,5 @@ def server_error(e):
 
 if __name__ == '__main__':
     ensure_seeded()
-    # Запуск аплікації
+
     app.run(host='0.0.0.0', port=5000, debug=True)
