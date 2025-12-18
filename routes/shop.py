@@ -148,10 +148,7 @@ def increase_quantity(sneaker_id):
 def decrease_quantity(sneaker_id):
     cart = session.get('cart', {})
     cart_id = str(sneaker_id)
-    if cart_id in cart:
-        if cart[cart_id] > 1:
-            cart[cart_id] -= 1
-        else:
-            del cart[cart_id]
+    if cart_id in cart and cart[cart_id] > 1:
+        cart[cart_id] -= 1
     session['cart'] = cart
     return redirect(url_for('shop.view_cart'))
