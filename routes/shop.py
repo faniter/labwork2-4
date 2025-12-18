@@ -125,3 +125,33 @@ def view_cart():
 def clear_cart():
     session['cart'] = {}
     return redirect(url_for('shop.view_cart'))
+
+@shop_bp.route('/api/cart/remove/<int:sneaker_id>', methods=['POST'])
+def remove_from_cart(sneaker_id):
+    cart = session.get('cart', {})
+    cart_id = str(sneaker_id)
+    if cart_id in cart:
+        del cart[cart_id]
+    session['cart'] = cart
+    return redirect(url_for('shop.view_cart'))
+
+@shop_bp.route('/api/cart/increase/<int:sneaker_id>', methods=['POST'])
+def increase_quantity(sneaker_id):
+    cart = session.get('cart', {})
+    cart_id = str(sneaker_id)
+    if cart_id in cart:
+        cart[cart_id] += 1
+    session['cart'] = cart
+    return redirect(url_for('shop.view_cart'))
+
+@shop_bp.route('/api/cart/decrease/<int:sneaker_id>', methods=['POST'])
+def decrease_quantity(sneaker_id):
+    cart = session.get('cart', {})
+    cart_id = str(sneaker_id)
+    if cart_id in cart:
+        if cart[cart_id] > 1:
+            cart[cart_id] -= 1
+        else:
+            del cart[cart_id]
+    session['cart'] = cart
+    return redirect(url_for('shop.view_cart'))
